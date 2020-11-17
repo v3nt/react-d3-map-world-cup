@@ -37,28 +37,12 @@ class WorldMap extends React.Component {
 
     //works up to here
 
-    // const nested = d3
-    //   .group()
-    //   .key((d) => d.year)
-    //   .rollup((leaves) => {
-    //     const total = d3.sum(leaves, (d) => d.attendance);
-    //     const coords = leaves.map((d) => projection([+d.long, +d.lat]));
-    //     const center_x = d3.mean(coords, (d) => d[0]);
-    //     const center_y = d3.mean(coords, (d) => d[1]);
-    //     return {
-    //       attendance: total,
-    //       x: center_x,
-    //       y: center_y,
-    //     };
-    //   })
-    //   .entries(data.cupData);
-
     const circles = mySvg
       .selectAll("circle")
       .data(data.cupData)
       .enter()
       .append("circle")
-      .attr("r", (d) => 0.00005 * d.attendance)
+      .attr("r", (d) => (d.attendance ? 0.00005 * d.attendance : 1))
       .attr("fill", "yellow")
       .attr("class", "location-marker")
       .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
@@ -69,31 +53,10 @@ class WorldMap extends React.Component {
       .data(data.cupData)
       .enter()
       .append("circle")
-      .attr("r", (d) => 0.00002 * d.attendance)
+      .attr("r", (d) => (d.attendance ? 0.00002 * d.attendance : 1))
       .attr("fill", "red")
       .attr("class", "location-marker")
       .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
-
-    // const attendance_extent = d3.extent(nested, (d) => d.value["attendance"]);
-    // const rScale = d3.scaleSqrt().domain(attendance_extent).range([0, 8]);
-    // svg
-    //   .append("g")
-    //   .attr("class", "bubble")
-    //   .selectAll("circle")
-    //   .data(
-    //     nested.sort(function (a, b) {
-    //       return b.value["attendance"] - a.value["attendance"];
-    //     })
-    //   )
-    //   .enter()
-    //   .append("circle")
-    //   .attr("fill", "rgb(247, 148, 42)")
-    //   .attr("cx", (d) => d.value["x"])
-    //   .attr("cy", (d) => d.value["y"])
-    //   .attr("r", (d) => rScale(d.value["attendance"]))
-    //   .attr("stroke", "black")
-    //   .attr("stroke-width", 0.7)
-    //   .attr("opacity", 0.7);
   };
 
   componentDidUpdate() {
@@ -108,26 +71,7 @@ class WorldMap extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <p> "test comp here"</p>
-        <div ref={(svg) => (this.svg = svg)}></div>
-      </div>
-    );
-    // const { data } = this.props;
-    // const styles = {
-    //   container: {
-    //     display: "grid",
-    //     justifyItems: "center",
-    //   },
-    // };
-    // return (
-    //   <div ref="chart" style={styles.container}>
-    //     <p style={{ textAlign: "center" }}>
-    //       Historical FIFA world cup geo map with React and D3.
-    //     </p>
-    //   </div>
-    // );
+    return <div ref={(svg) => (this.svg = svg)}></div>;
   }
 }
 export default WorldMap;
