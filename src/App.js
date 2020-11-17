@@ -1,18 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import WorldMap from "./WorldMap";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: {
-        geoData: null,
-        cupData: null,
-      },
-    };
-  }
+function App() {
+  const [data, setData] = useState({});
 
-  componentDidMout() {
+  const getData = () => {
     Promise.all([
       fetch(
         "https://raw.githubusercontent.com/ahebwa49/geo_mapping/master/src/world_countries.json"
@@ -22,20 +14,23 @@ class App extends React.Component {
       ),
     ])
       .then((responses) => Promise.all(responses.map((resp) => resp.json())))
-      .then(([geoData, cupData]) => {
-        this.setState({
-          data: {
-            geoData: geoData,
-            cupData: cupData,
-          },
+      .then(function ([geoData, cupData]) {
+        // console.log([geoData, cupData]);
+        setData({
+          geoData: geoData,
+          cupData: cupData,
         });
       });
-  }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
 
-  render() {
-    const { data } = this.state;
-    return <div>{data.geoData && <WorldMap data={data} />}</div>;
-  }
+  return (
+    <div>
+      <WorldMap data={data} />
+    </div>
+  );
 }
 
 export default App;
