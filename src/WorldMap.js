@@ -63,6 +63,17 @@ class WorldMap extends React.Component {
       .attr("class", "location-marker")
       .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
 
+    const circlesB = mySvg
+      .append("g")
+      .selectAll("circle")
+      .data(data.cupData)
+      .enter()
+      .append("circle")
+      .attr("r", (d) => 0.00002 * d.attendance)
+      .attr("fill", "red")
+      .attr("class", "location-marker")
+      .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
+
     // const attendance_extent = d3.extent(nested, (d) => d.value["attendance"]);
     // const rScale = d3.scaleSqrt().domain(attendance_extent).range([0, 8]);
     // svg
