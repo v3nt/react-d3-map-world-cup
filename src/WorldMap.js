@@ -2,6 +2,7 @@ import React from "react";
 import * as d3 from "d3";
 import axios from "axios";
 import "./main.scss";
+import Button from "./Button";
 
 const margin = 75;
 const width = 1200 - margin;
@@ -21,6 +22,7 @@ class WorldMap extends React.Component {
   createMap = (data) => {
     console.log("createMap", data);
     const svg = this.svg;
+    const keyCity = this.keyCity;
     ///
     const mySvg = d3
       .select(svg)
@@ -107,8 +109,18 @@ class WorldMap extends React.Component {
       });
   }
 
+  map_zoom = () => {
+    console.log("maps zoom");
+  };
+
   render() {
-    return <div ref={(svg) => (this.svg = svg)}></div>;
+    return (
+      <div>
+        <Button label="Fit map" onClickFunction={this.map_zoom} />
+        <div ref={(svg) => (this.svg = svg)}></div>
+        <div ref={(keyCity) => (this.keyCity = keyCity)}></div>
+      </div>
+    );
   }
 }
 export default WorldMap;
