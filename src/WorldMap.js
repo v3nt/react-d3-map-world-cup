@@ -5,8 +5,8 @@ import "./main.scss";
 import Button from "./Button";
 
 const margin = 75;
-const width = 1200 - margin;
-const height = 650 - margin;
+const width = 900 - margin;
+const height = 550 - margin;
 
 class WorldMap extends React.Component {
   constructor(props) {
@@ -46,6 +46,7 @@ class WorldMap extends React.Component {
       .data(data.geoData.features)
       .enter()
       .append("path")
+      .attr("data-country", (d) => d.properties.name)
       .attr("d", path);
 
     //works up to here
@@ -60,16 +61,16 @@ class WorldMap extends React.Component {
       .attr("class", "location-marker")
       .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
 
-    const circlesB = mySvg
-      .append("g")
-      .selectAll("circle")
-      .data(data.cupData)
-      .enter()
-      .append("circle")
-      .attr("r", (d) => (d.attendance ? 0.00002 * d.attendance : 1))
-      .attr("fill", "red")
-      .attr("class", "location-marker")
-      .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
+    // const circlesB = mySvg
+    //   .append("g")
+    //   .selectAll("circle")
+    //   .data(data.cupData)
+    //   .enter()
+    //   .append("circle")
+    //   .attr("r", (d) => (d.attendance ? 0.00002 * d.attendance : 1))
+    //   .attr("fill", "red")
+    //   .attr("class", "location-marker")
+    //   .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
   };
 
   componentDidUpdate() {
@@ -109,15 +110,18 @@ class WorldMap extends React.Component {
       });
   }
 
-  map_zoom = () => {
-    console.log("maps zoom");
+  map_zoom = (test) => {
+    console.log("map zoom", test);
   };
 
   render() {
     return (
       <div>
-        <Button label="Fit map" onClickFunction={this.map_zoom} />
-        <div ref={(svg) => (this.svg = svg)}></div>
+        <div ref={(svg) => (this.svg = svg)}>
+          <Button label="Fit map" onClickFunction={this.map_zoom} />
+          <Button label="Fit markers" onClickFunction={this.map_zoom} />
+          <Button label="Fit USA" onClickFunction={this.map_zoom} />
+        </div>
         <div ref={(keyCity) => (this.keyCity = keyCity)}></div>
       </div>
     );

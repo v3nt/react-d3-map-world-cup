@@ -18,7 +18,9 @@ class Button extends React.Component {
   //   }
   render() {
     return (
-      <button onClick={this.props.onClickFunction}>{this.props.label}</button>
+      <button onClick={() => this.props.onClickFunction(this.props.label)}>
+        {this.props.label}
+      </button>
     );
   }
 }
