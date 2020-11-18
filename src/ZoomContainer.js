@@ -4,7 +4,6 @@ import { useSvg } from "./Stage";
 
 const ZoomContainer = function ({ children }) {
   console.log(children);
-  //   console.log(children.parentNode.parentNode.removeChild(children.parentNode));
   const svgElement = useSvg();
   const [{ x, y, k }, setTransform] = useState({ x: 0, y: 0, k: 1 });
 

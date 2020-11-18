@@ -3,8 +3,6 @@ import * as d3 from "d3";
 import axios from "axios";
 import "./main.scss";
 import Button from "./Button";
-import ZoomContainer from "./ZoomContainer";
-import { Stage, useSvg } from "./Stage";
 
 const margin = 75;
 const width = 900 - margin;
@@ -36,12 +34,14 @@ class WorldMap extends React.Component {
 
     const keyCity = this.keyCity;
     ///
-    this.mySvg = d3.select(this.svg);
-    // .attr("viewBox", "0 0 " + width + " " + height + "")
-    // .attr("width", width)
-    // .attr("height", height);
+    this.mySvg = d3
+      .select(this.svg)
+      .append("svg")
+      .attr("viewBox", "0 0 " + width + " " + height + "")
+      .attr("width", width)
+      .attr("height", height);
 
-    // this.g = this.mySvg.select("g").attr("x", 0).attr("y", 0);
+    this.g = this.mySvg.append("g").attr("x", 0).attr("y", 0);
 
     const projection = d3
       .geoMercator()
@@ -50,7 +50,7 @@ class WorldMap extends React.Component {
 
     this.path = d3.geoPath().projection(projection);
 
-    this.map = this.mySvg
+    this.map = this.g
       .selectAll("path")
       .data(data.geoData.features)
       .enter()
@@ -60,7 +60,7 @@ class WorldMap extends React.Component {
 
     //works up to here
 
-    const circles = this.mySvg
+    const circles = this.g
       .selectAll("circle")
       .data(data.cupData)
       .enter()
@@ -180,11 +180,8 @@ class WorldMap extends React.Component {
           value="50000"
           onClickFunction={this.markers_by_value}
         />
-        <Stage width="100%" height={400}>
-          <ZoomContainer>
-            <g ref={(svg) => (this.svg = svg)} />
-          </ZoomContainer>
-        </Stage>
+
+        <div ref={(svg) => (this.svg = svg)}></div>
         <div ref={(keyCity) => (this.keyCity = keyCity)}></div>
       </div>
     );
