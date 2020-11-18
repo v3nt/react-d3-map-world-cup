@@ -132,8 +132,8 @@ class WorldMap extends React.Component {
     // g.selectAll("path").attr("stroke-width", 1 / transform.k);
   };
 
-  map_zoom = (test) => {
-    console.log("map zoom", test);
+  map_zoom = (props) => {
+    console.log("map zoom", props.test);
     // this.map.transition().duration(750).call(d3.zoom().on("zoom", this.zoomed));
     // this.mySvg = d3
     //   .select(this.svg)
@@ -144,11 +144,19 @@ class WorldMap extends React.Component {
     //   .append("g")
     //   .attr("x", 0)
     //   .attr("y", 0);
-    this.mySvg = d3
-      .select(this.svg)
+    d3.select(this.svg)
       .selectAll("circle")
       .attr("fill", "red")
       .call(d3.zoom().on("zoom", this.zoomed));
+  };
+
+  markers_by_value = (props) => {
+    console.log(props);
+    d3.selectAll(props.target)
+      .filter(function (d) {
+        return d.attendance > props.value;
+      })
+      .style("fill", "green");
   };
 
   render() {
@@ -158,6 +166,12 @@ class WorldMap extends React.Component {
           <Button label="Fit map" onClickFunction={this.map_zoom} />
           <Button label="Fit markers" onClickFunction={this.map_zoom} />
           <Button label="Fit USA" onClickFunction={this.map_zoom} />
+          <Button
+            label="Attendence > 50000"
+            target={"circle"}
+            value="50000"
+            onClickFunction={this.markers_by_value}
+          />
         </div>
         <div ref={(keyCity) => (this.keyCity = keyCity)}></div>
       </div>
