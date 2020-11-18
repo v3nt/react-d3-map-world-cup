@@ -1,6 +1,7 @@
 import React from "react";
 import * as d3 from "d3";
 import axios from "axios";
+import "./main.scss";
 
 const margin = 75;
 const width = 1200 - margin;
