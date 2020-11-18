@@ -44,3 +44,7 @@ svg {
 .location-marker {
   opacity: 0.5;
 }
+
+[data-country] {
+  fill: gray;
+}
