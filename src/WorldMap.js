@@ -8,10 +8,19 @@ const margin = 75;
 const width = 900 - margin;
 const height = 550 - margin;
 
+const radius = 2;
+// const mySvg = null;
+// const path = null;
+
 class WorldMap extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
+      mySvg: null,
+      path: null,
+      map: null,
+      svg: this.svg,
       data: {
         geoData: null,
         cupData: null,
@@ -21,11 +30,11 @@ class WorldMap extends React.Component {
 
   createMap = (data) => {
     console.log("createMap", data);
-    const svg = this.svg;
+
     const keyCity = this.keyCity;
     ///
-    const mySvg = d3
-      .select(svg)
+    this.mySvg = d3
+      .select(this.svg)
       .append("svg")
       .attr("viewBox", "0 0 " + width + " " + height + "")
       .attr("width", width)
@@ -39,19 +48,19 @@ class WorldMap extends React.Component {
       .scale(100)
       .translate([width / 2, height / 2]);
 
-    const path = d3.geoPath().projection(projection);
+    this.path = d3.geoPath().projection(projection);
 
-    const map = mySvg
+    this.map = this.mySvg
       .selectAll("path")
       .data(data.geoData.features)
       .enter()
       .append("path")
       .attr("data-country", (d) => d.properties.name)
-      .attr("d", path);
+      .attr("d", this.path);
 
     //works up to here
 
-    const circles = mySvg
+    const circles = this.mySvg
       .selectAll("circle")
       .data(data.cupData)
       .enter()
@@ -110,8 +119,36 @@ class WorldMap extends React.Component {
       });
   }
 
+  zoomed = (event) => {
+    const { transform } = event;
+    console.log(event);
+
+    // this.mySvg.select("g").attr("transform", transform);
+    // // this.mySvg.select("g").attr("stroke-width", 1 / transform.k);
+    // this.mySvg
+    //   .selectAll("circle")
+    //   .attr("d", this.path)
+    //   .attr("r", radius / (transform.k > 0 ? transform.k * 0.9 : radius));
+    // g.selectAll("path").attr("stroke-width", 1 / transform.k);
+  };
+
   map_zoom = (test) => {
     console.log("map zoom", test);
+    // this.map.transition().duration(750).call(d3.zoom().on("zoom", this.zoomed));
+    // this.mySvg = d3
+    //   .select(this.svg)
+    //   .append("svg")
+    //   .attr("viewBox", "0 0 " + width + " " + height + "")
+    //   .attr("width", width)
+    //   .attr("height", height)
+    //   .append("g")
+    //   .attr("x", 0)
+    //   .attr("y", 0);
+    this.mySvg = d3
+      .select(this.svg)
+      .selectAll("circle")
+      .attr("fill", "red")
+      .call(d3.zoom().on("zoom", this.zoomed));
   };
 
   render() {
