@@ -4,6 +4,7 @@ import WorldMap from "./WorldMap";
 function App() {
   return (
     <div>
+      <text>Hello, World!</text>
       <WorldMap />
     </div>
   );

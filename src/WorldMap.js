@@ -3,6 +3,8 @@ import * as d3 from "d3";
 import axios from "axios";
 import "./main.scss";
 import Button from "./Button";
+import ZoomContainer from "./ZoomContainer";
+import { Stage, useSvg } from "./Stage";
 
 const margin = 75;
 const width = 900 - margin;
@@ -18,6 +20,7 @@ class WorldMap extends React.Component {
 
     this.state = {
       mySvg: null,
+      g: null,
       path: null,
       map: null,
       svg: this.svg,
@@ -33,15 +36,12 @@ class WorldMap extends React.Component {
 
     const keyCity = this.keyCity;
     ///
-    this.mySvg = d3
-      .select(this.svg)
-      .append("svg")
-      .attr("viewBox", "0 0 " + width + " " + height + "")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("x", 0)
-      .attr("y", 0);
+    this.mySvg = d3.select(this.svg);
+    // .attr("viewBox", "0 0 " + width + " " + height + "")
+    // .attr("width", width)
+    // .attr("height", height);
+
+    // this.g = this.mySvg.select("g").attr("x", 0).attr("y", 0);
 
     const projection = d3
       .geoMercator()
@@ -119,6 +119,15 @@ class WorldMap extends React.Component {
       });
   }
 
+  // zoom = d3
+  //   .zoom()
+  //   .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
+  //   .extent([
+  //     [0, 0],
+  //     [containerWidth, containerHeight],
+  //   ])
+  //   .on("zoom", updateChart);
+
   zoomed = (event) => {
     const { transform } = event;
     console.log(event);
@@ -156,23 +165,26 @@ class WorldMap extends React.Component {
       .filter(function (d) {
         return d.attendance > props.value;
       })
-      .style("fill", "green");
+      .attr("fill", "green");
   };
 
   render() {
     return (
       <div>
-        <div ref={(svg) => (this.svg = svg)}>
-          <Button label="Fit map" onClickFunction={this.map_zoom} />
-          <Button label="Fit markers" onClickFunction={this.map_zoom} />
-          <Button label="Fit USA" onClickFunction={this.map_zoom} />
-          <Button
-            label="Attendence > 50000"
-            target={"circle"}
-            value="50000"
-            onClickFunction={this.markers_by_value}
-          />
-        </div>
+        <Button label="Fit map" onClickFunction={this.map_zoom} />
+        <Button label="Fit markers" onClickFunction={this.map_zoom} />
+        <Button label="Fit USA" onClickFunction={this.map_zoom} />
+        <Button
+          label="Attendence > 50000"
+          target={"circle"}
+          value="50000"
+          onClickFunction={this.markers_by_value}
+        />
+        <Stage width="100%" height={400}>
+          <ZoomContainer>
+            <g ref={(svg) => (this.svg = svg)} />
+          </ZoomContainer>
+        </Stage>
         <div ref={(keyCity) => (this.keyCity = keyCity)}></div>
       </div>
     );
