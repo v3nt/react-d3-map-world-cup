@@ -8,6 +8,7 @@ import { transform } from "topojson-client";
 const margin = 75;
 const width = 900 - margin;
 const height = 550 - margin;
+const chartHeight = 300;
 
 const radius = 2;
 // const mySvg = null;
@@ -19,7 +20,9 @@ class WorldMap extends React.Component {
 
     this.state = {
       mySvg: null,
+      myChart: null,
       g: null,
+      gChart: null,
       path: null,
       map: null,
       svg: this.svg,
@@ -28,13 +31,148 @@ class WorldMap extends React.Component {
         geoData: null,
         cupData: null,
       },
+      yAxisAttribute: "skill",
+      xAxisAttribute: "attendence",
+      width: 0,
+      height: 0,
     };
+
+    this.chartRef = React.createRef();
   }
+
+  componentDidUpdate() {}
+
+  componentDidMount() {
+    let one =
+      "https://raw.githubusercontent.com/ahebwa49/geo_mapping/master/src/world_countries.json";
+    let two =
+      "https://raw.githubusercontent.com/ahebwa49/geo_mapping/master/src/world_cup_geo.json";
+
+    const requestOne = axios.get(one);
+    const requestTwo = axios.get(two);
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+
+          this.setState({
+            geoData: responseOne,
+            cupData: responseTwo,
+          });
+
+          this.createMap({
+            geoData: responseOne.data,
+            cupData: responseTwo.data,
+          });
+          this.createChart({
+            cupData: responseTwo.data,
+          });
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+      });
+  }
+
+  createChart = (data) => {
+    const self = this;
+
+    console.log("createChart");
+
+    ///
+    this.svgChart = d3
+      .select(this.svg)
+      .append("svg")
+      .attr("viewBox", "0 0 " + width + " " + chartHeight + "")
+      .attr("width", width)
+      .attr("height", chartHeight);
+
+    this.gChart = this.svgChart.append("g").attr("x", 0).attr("y", 0);
+    self.gChart = this.gChart;
+
+    // AND IF YOU WANT THE min/max of the KEYS:
+    console.log(
+      d3.min(data.cupData, function (d) {
+        return d.attendance;
+      })
+    );
+    console.log(
+      d3.max(data.cupData, function (d) {
+        return d.attendance;
+      })
+    );
+    console.log(
+      d3.max(data.cupData, function (d) {
+        return d.year;
+      })
+    );
+
+    var attendanceScale = d3
+      .scaleLinear()
+      .domain([
+        d3.min(data.cupData, function (d) {
+          return d.attendance;
+        }),
+        d3.max(data.cupData, function (d) {
+          return d.attendance;
+        }),
+      ])
+      .range([10, 960]);
+    console.log(attendanceScale);
+
+    var yearsScale = d3
+      .scaleLinear()
+      .data(data.cupData)
+      .domain([
+        d3.min(data.cupData, (d) => {
+          return d.year;
+        }),
+        d3.max(data.cupData, (d) => {
+          return d.year;
+        }),
+      ])
+      .range([0, 960]);
+    console.log(yearsScale);
+    // var scale = d3
+    //   .scaleLinear()
+    //   .domain([
+    //     d3.min(data.cupData, function (d) {
+    //       return d.attendance;
+    //     }),
+
+    //     d3.max(data.cupData.attendance),
+    //   ])
+    //   .range([50, 500]);
+    // console.log(scale);
+
+    const x = d3.scaleLinear().rangeRound([0, width]);
+
+    const y = d3.scaleLinear().rangeRound([chartHeight, 0]);
+
+    data.cupData.map((d, index) => {});
+
+    this.svgChart
+      .selectAll("rect")
+      .data(data.cupData)
+      .enter()
+      .append("rect")
+      .style("fill", "red")
+      .attr("x", (d, i) => i * 1)
+      .attr("y", (d, i) => 300 - d.attendance * 0.003)
+      .attr("width", 1)
+      .attr("height", (d, i) => d.attendance * 0.003)
+      .attr("attendance", (d) => {
+        return d.attendance;
+      })
+      .attr("year", (d) => {
+        return d.year;
+      });
+  };
 
   createMap = (data) => {
     const self = this;
-
-    console.log("createMap", data);
 
     const keyCity = this.keyCity;
     ///
@@ -54,7 +192,6 @@ class WorldMap extends React.Component {
         .scaleExtent([1, 15])
         .on("zoom", function (event) {
           const { transform } = event;
-          console.log(transform);
           self.g.attr("transform", transform);
           self.g
             .selectAll("circle")
@@ -117,43 +254,6 @@ class WorldMap extends React.Component {
     //   .attr("class", "location-marker")
     //   .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
   };
-
-  componentDidUpdate() {
-    console.log("componentDidUpdate");
-  }
-
-  componentDidMount() {
-    console.log("componentDidMount");
-
-    let one =
-      "https://raw.githubusercontent.com/ahebwa49/geo_mapping/master/src/world_countries.json";
-    let two =
-      "https://raw.githubusercontent.com/ahebwa49/geo_mapping/master/src/world_cup_geo.json";
-
-    const requestOne = axios.get(one);
-    const requestTwo = axios.get(two);
-    axios
-      .all([requestOne, requestTwo])
-      .then(
-        axios.spread((...responses) => {
-          const responseOne = responses[0];
-          const responseTwo = responses[1];
-
-          this.setState({
-            geoData: responseOne,
-            cupData: responseTwo,
-          });
-
-          this.createMap({
-            geoData: responseOne.data,
-            cupData: responseTwo.data,
-          });
-        })
-      )
-      .catch((errors) => {
-        // react on errors.
-      });
-  }
 
   reset_zoom = () => {
     this.g.transition().duration(200).attr("transform", { k: 0, x: 0, y: 0 });
