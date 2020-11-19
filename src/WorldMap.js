@@ -59,26 +59,18 @@ class WorldMap extends React.Component {
           self.g
             .selectAll("circle")
             .transition()
-            .duration(1)
-            .attr(
-              "r",
-              (d) => transformRadius(transform, d.attendance)
-              // .attr("r", (d) =>
-              //   d.attendance
-              //     ? (0.00005 * d.attendance) /
-              //       (transform.k > 1.5
-              //         ? transform.k * 0.5
-              //         : 0.00005 * d.attendance)
-              //     : 1
-            );
+            .duration(750)
+            .attr("r", (d) => transformRadius(transform, d.attendance));
           // .attr("r", radius / (transform.k > 0 ? transform.k * 0.9 : radius));
         })
     );
 
     const transformRadius = (trans, attendance) => {
-      return attendance && trans.k > 1.5
-        ? (0.00005 * attendance) / trans.k
-        : 0.00005 * attendance;
+      var newRadius =
+        attendance && trans.k > 1.5
+          ? (0.00005 * attendance) / trans.k
+          : 0.00005 * attendance;
+      return newRadius;
     };
 
     this.projection = d3
@@ -103,7 +95,7 @@ class WorldMap extends React.Component {
       .data(data.cupData)
       .enter()
       .append("circle")
-      .attr("r", (d) => (d.attendance ? 0.00005 * d.attendance : 1))
+      .attr("r", (d) => (d.attendance ? 0.00005 * d.attendance : 3))
       .attr("team1", (d) => d.team1)
       .attr("team2", (d) => d.team2)
       .attr("goals", (d) => d.goals)
@@ -163,6 +155,10 @@ class WorldMap extends React.Component {
       });
   }
 
+  reset_zoom = () => {
+    this.g.transition().duration(200).attr("transform", { k: 0, x: 0, y: 0 });
+  };
+
   map_zoom = (props) => {
     console.log("map zoom", props.test);
     // this.map.transition().duration(750).call(d3.zoom().on("zoom", this.zoomed));
@@ -200,6 +196,7 @@ class WorldMap extends React.Component {
   render() {
     return (
       <div>
+        <Button label="Reset" onClickFunction={this.reset_zoom} />
         <Button label="Fit map" onClickFunction={this.map_zoom} />
         <Button label="Fit markers" onClickFunction={this.map_zoom} />
         <Button label="Fit USA" onClickFunction={this.map_zoom} />
