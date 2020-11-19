@@ -109,43 +109,31 @@ class WorldMap extends React.Component {
       })
     );
 
-    var attendanceScale = d3
-      .scaleLinear()
-      .domain([
-        d3.min(data.cupData, function (d) {
-          return d.attendance;
-        }),
-        d3.max(data.cupData, function (d) {
-          return d.attendance;
-        }),
-      ])
-      .range([10, 960]);
-    console.log(attendanceScale);
-
-    var yearsScale = d3
-      .scaleLinear()
-      .data(data.cupData)
-      .domain([
-        d3.min(data.cupData, (d) => {
-          return d.year;
-        }),
-        d3.max(data.cupData, (d) => {
-          return d.year;
-        }),
-      ])
-      .range([0, 960]);
-    console.log(yearsScale);
-    // var scale = d3
+    // var attendanceScale = d3
     //   .scaleLinear()
     //   .domain([
     //     d3.min(data.cupData, function (d) {
     //       return d.attendance;
     //     }),
-
-    //     d3.max(data.cupData.attendance),
+    //     d3.max(data.cupData, function (d) {
+    //       return d.attendance;
+    //     }),
     //   ])
-    //   .range([50, 500]);
-    // console.log(scale);
+    //   .range([10, 960]);
+    // console.log(attendanceScale);
+
+    // var yearsScale = d3
+    //   .scaleLinear()
+    //   .domain([
+    //     d3.min(data.cupData, (d) => {
+    //       return d.year;
+    //     }),
+    //     d3.max(data.cupData, (d) => {
+    //       return d.year;
+    //     }),
+    //   ])
+    //   .range([0, 960]);
+    // console.log(yearsScale);
 
     const x = d3.scaleLinear().rangeRound([0, width]);
 
