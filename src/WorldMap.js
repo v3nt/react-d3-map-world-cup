@@ -5,12 +5,10 @@ import "./main.scss";
 import Button from "./Button";
 import { transform } from "topojson-client";
 
-const margin = 75;
-const width = 900 - margin;
-const height = 550 - margin;
-const chartHeight = 300;
+const width = 900;
+const height = 350;
+const chartHeight = 400;
 
-const radius = 2;
 // const mySvg = null;
 // const path = null;
 
@@ -78,6 +76,10 @@ class WorldMap extends React.Component {
 
   createChart = (data) => {
     const self = this;
+    const cupData = data.cupData;
+    var cupDataSorted = cupData.sort(
+      (a, b) => parseFloat(a.year) - parseFloat(b.year)
+    );
 
     console.log("createChart");
 
@@ -94,85 +96,83 @@ class WorldMap extends React.Component {
 
     // AND IF YOU WANT THE min/max of the KEYS:
     console.log(
-      d3.min(data.cupData, function (d) {
-        return d.attendance;
+      "min",
+      d3.min(cupDataSorted, function (d) {
+        return +d.attendance;
+      })
+    );
+    var yMax = d3.max(cupDataSorted, function (d) {
+      return +d.attendance;
+    });
+
+    console.log(
+      "max",
+      yMax,
+      d3.max(cupDataSorted, function (d) {
+        return +d.attendance;
       })
     );
     console.log(
-      d3.max(data.cupData, function (d) {
-        return d.attendance;
-      })
-    );
-    console.log(
-      d3.max(data.cupData, function (d) {
+      d3.max(cupDataSorted, function (d) {
         return d.year;
       })
     );
 
-    // var attendanceScale = d3
-    //   .scaleLinear()
-    //   .domain([
-    //     d3.min(data.cupData, function (d) {
-    //       return d.attendance;
-    //     }),
-    //     d3.max(data.cupData, function (d) {
-    //       return d.attendance;
-    //     }),
-    //   ])
-    //   .range([10, 960]);
-    // console.log(attendanceScale);
+    var xscale = d3
+      .scaleLinear()
+      .domain([
+        1920,
+        d3.max(cupDataSorted, function (d) {
+          return d.year;
+        }),
+      ])
+      .range([0, width - 100]);
 
-    // var yearsScale = d3
-    //   .scaleLinear()
-    //   .domain([
-    //     d3.min(data.cupData, (d) => {
-    //       return d.year;
-    //     }),
-    //     d3.max(data.cupData, (d) => {
-    //       return d.year;
-    //     }),
-    //   ])
-    //   .range([0, 960]);
-    // console.log(yearsScale);
+    var yscale = d3
+      .scaleLinear()
+      .domain([0, 200000])
+      .range([chartHeight - 25, 0]);
 
-    const x = d3.scaleLinear().rangeRound([0, width]);
+    var x_axis = d3.axisBottom().scale(xscale);
 
-    const y = d3.scaleLinear().rangeRound([chartHeight, 0]);
-
-    data.cupData.map((d, index) => {
-      console.log("import", index, d.year);
-    });
-
-    var cupDataSorted = data.cupData.sort(
-      (a, b) => parseFloat(a.year) - parseFloat(b.year)
-    );
-
-    cupDataSorted.map((d, index) => {
-      console.log("Ordered?", index, d.year);
-    });
+    var y_axis = d3.axisLeft().scale(yscale);
 
     this.svgChart
+      .append("g")
+      .attr("transform", "translate(50, 0)")
+      .call(y_axis);
+
+    var xAxisTranslate = chartHeight - 25;
+
+    this.svgChart
+      .append("g")
+      .attr("transform", "translate(50, " + xAxisTranslate + ")")
+      .call(x_axis);
+
+    this.svgChart
+      .append("g")
+      .attr("transform", "translate(50, 25)")
       .selectAll("rect")
-      .data(data.cupData)
+      .data(cupDataSorted)
       .enter()
       .append("rect")
       .style("fill", "red")
       .attr("x", (d, i) => i * 1)
-      .attr("y", (d, i) => 300 - d.attendance * 0.003)
+      .attr("y", (d, i) => yscale(d.attendance) - 25)
       .attr("width", 0.5)
-      .attr("height", (d, i) => d.attendance * 0.003)
-      .attr("attendance", (d) => {
-        return d.attendance;
-      })
-      .attr("year", (d) => {
-        return d.year;
-      });
+      .attr("height", (d, i) => chartHeight - 25 - yscale(d.attendance))
+      .attr("gamid", (d) => d.game_id)
+      .attr("attendance", (d) => d.attendance)
+      .attr("year", (d) => d.year)
+      .attr("team1", (d) => d.team1)
+      .attr("team2", (d) => d.team2)
+      .attr("home", (d) => d.home)
+      .attr("goals", (d) => d.goals);
   };
 
   createMap = (data) => {
     const self = this;
 
-    const keyCity = this.keyCity;
     ///
     this.mySvg = d3
       .select(this.svg)
@@ -231,6 +231,7 @@ class WorldMap extends React.Component {
       .enter()
       .append("circle")
       .attr("r", (d) => (d.attendance ? 0.00005 * d.attendance : 3))
+      .attr("gamid", (d) => d.game_id)
       .attr("year", (d) => d.year)
       .attr("team1", (d) => d.team1)
       .attr("team2", (d) => d.team2)
