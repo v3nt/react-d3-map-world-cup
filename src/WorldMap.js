@@ -139,7 +139,17 @@ class WorldMap extends React.Component {
 
     const y = d3.scaleLinear().rangeRound([chartHeight, 0]);
 
-    data.cupData.map((d, index) => {});
+    data.cupData.map((d, index) => {
+      console.log("import", index, d.year);
+    });
+
+    var cupDataSorted = data.cupData.sort(
+      (a, b) => parseFloat(a.year) - parseFloat(b.year)
+    );
+
+    cupDataSorted.map((d, index) => {
+      console.log("Ordered?", index, d.year);
+    });
 
     this.svgChart
       .selectAll("rect")
@@ -221,6 +231,7 @@ class WorldMap extends React.Component {
       .enter()
       .append("circle")
       .attr("r", (d) => (d.attendance ? 0.00005 * d.attendance : 3))
+      .attr("year", (d) => d.year)
       .attr("team1", (d) => d.team1)
       .attr("team2", (d) => d.team2)
       .attr("goals", (d) => d.goals)
