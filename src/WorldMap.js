@@ -83,7 +83,6 @@ class WorldMap extends React.Component {
 
     console.log("createChart");
 
-    ///
     this.svgChart = d3
       .select(this.svg)
       .append("svg")
@@ -94,34 +93,21 @@ class WorldMap extends React.Component {
     this.gChart = this.svgChart.append("g").attr("x", 0).attr("y", 0);
     self.gChart = this.gChart;
 
-    // AND IF YOU WANT THE min/max of the KEYS:
-    console.log(
-      "min",
-      d3.min(cupDataSorted, function (d) {
-        return +d.attendance;
-      })
-    );
     var yMax = d3.max(cupDataSorted, function (d) {
       return +d.attendance;
     });
 
-    console.log(
-      "max",
-      yMax,
-      d3.max(cupDataSorted, function (d) {
-        return +d.attendance;
-      })
-    );
-    console.log(
-      d3.max(cupDataSorted, function (d) {
-        return d.year;
-      })
-    );
+    var xMax = d3.max(cupDataSorted, function (d) {
+      return +d.year;
+    });
+    var xMin = d3.min(cupDataSorted, function (d) {
+      return +d.year;
+    });
 
     var xscale = d3
       .scaleLinear()
       .domain([
-        1920,
+        1926,
         d3.max(cupDataSorted, function (d) {
           return d.year;
         }),
@@ -130,12 +116,23 @@ class WorldMap extends React.Component {
 
     var yscale = d3
       .scaleLinear()
-      .domain([0, 200000])
+      .domain([0, yMax])
       .range([chartHeight - 25, 0]);
 
-    var x_axis = d3.axisBottom().scale(xscale);
+    var x_axis = d3
+      .axisBottom()
+      .scale(xscale)
+      .tickFormat(function (d, i) {
+        return i % 4 === 0 ? d : null;
+      })
+      .ticks((xMax - xMin) * 1);
 
-    var y_axis = d3.axisLeft().scale(yscale);
+    var y_axis = d3
+      .axisLeft()
+      .scale(yscale)
+      .tickFormat(function (d, i) {
+        return i % 2 === 0 ? d : null;
+      });
 
     this.svgChart
       .append("g")
@@ -157,7 +154,7 @@ class WorldMap extends React.Component {
       .enter()
       .append("rect")
       .style("fill", "red")
-      .attr("x", (d, i) => i * 1)
+      .attr("x", (d, i) => xscale(d.year) * 1)
       .attr("y", (d, i) => yscale(d.attendance) - 25)
       .attr("width", 0.5)
       .attr("height", (d, i) => chartHeight - 25 - yscale(d.attendance))
