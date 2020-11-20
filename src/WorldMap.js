@@ -149,7 +149,7 @@ class WorldMap extends React.Component {
       .style("fill", "red")
       .attr("x", (d, i) => i * 1)
       .attr("y", (d, i) => 300 - d.attendance * 0.003)
-      .attr("width", 1)
+      .attr("width", 0.5)
       .attr("height", (d, i) => d.attendance * 0.003)
       .attr("attendance", (d) => {
         return d.attendance;
