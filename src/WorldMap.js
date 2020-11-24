@@ -211,7 +211,7 @@ class WorldMap extends React.Component {
         .enter()
         .append("rect")
         .attr("x", (dg, i) => {
-          return xscale(dg.year) + i * 2;
+          return xscale(dg.year) + i * 2; // i've spaced these jsut so i can see and incpect them.
         })
         .attr("y", (dg, i, nodes) => {
           var prevY,
@@ -222,9 +222,14 @@ class WorldMap extends React.Component {
             prevSibData = i > 0 ? nodes[i - 1].__data__ : 0;
 
           prevY = i > 0 ? yscale(prevSibData.attendance) : 0;
-          prevH = i > 0 ? chartHeight - yscale(prevSibData.attendance) : 0;
+          prevH =
+            i > 0
+              ? chartHeight -
+                yscale(prevSibData.attendance) -
+                yscale(dg.attendance)
+              : yscale(dg.attendance);
 
-          newY = currH - prevH;
+          newY = chartHeight - currH - prevH;
 
           console.log(i, currH, prevH, newY);
 
