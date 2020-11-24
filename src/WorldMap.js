@@ -217,23 +217,16 @@ class WorldMap extends React.Component {
           var prevY,
             prevH,
             newY,
-            currY = yscale(dg.attendance),
+            currY = chartHeight - yscale(dg.attendance),
             currH = yscale(dg.attendance),
             prevSibData = i > 0 ? nodes[i - 1].__data__ : 0;
 
           prevY = i > 0 ? chartHeight - yscale(prevSibData.attendance) : 0;
-          prevH = i > 0 ? yscale(prevSibData.attendance) : 0;
+          prevH = i > 0 ? chartHeight - yscale(prevSibData.attendance) : 0;
 
-          newY = currH - prevH + prevY;
+          newY = currH + prevH;
 
-          console.log(i, newY, yscale(dg.attendance), dg.attendance, dg);
-          console.log(
-            i,
-            newY,
-            yscale(prevSibData.attendance),
-            prevSibData.attendance,
-            prevSibData
-          );
+          console.log(i, currH, prevH, newY);
 
           return newY;
         })
