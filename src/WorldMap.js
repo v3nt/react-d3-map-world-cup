@@ -8,7 +8,7 @@ import { transform } from "topojson-client";
 const width = 900;
 const height = 350;
 const chartHeight = 400;
-
+const chartPadding = 30;
 // const mySvg = null;
 // const path = null;
 
@@ -112,6 +112,8 @@ class WorldMap extends React.Component {
       });
 
       console.log("yMax", yMax);
+
+      var y = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
     } else {
       var yMax = d3.max(cupDataSorted, function (d) {
         return +d.attendance;
@@ -140,7 +142,7 @@ class WorldMap extends React.Component {
     var yscale = d3
       .scaleLinear()
       .domain([0, yMax])
-      .range([chartHeight - 25, 0]);
+      .range([chartHeight - chartPadding, 0]);
 
     var x_axis = d3
       .axisBottom()
@@ -162,7 +164,7 @@ class WorldMap extends React.Component {
       .attr("transform", "translate(50, 0)")
       .call(y_axis);
 
-    var xAxisTranslate = chartHeight - 25;
+    var xAxisTranslate = chartHeight - chartPadding;
 
     this.svgChart
       .append("g")
@@ -172,18 +174,16 @@ class WorldMap extends React.Component {
     if (!data.groupBy) {
       this.svgChart
         .append("g")
-        .attr("transform", "translate(50, 25)")
+        .attr("transform", "translate(50, 0)")
         .selectAll("rect")
         .data(cupDataSorted)
         .enter()
         .append("rect")
         .style("fill", "red")
         .attr("x", (d, i) => (d.year ? xscale(d.year) * 1 : 0))
-        .attr("y", (d, i) => (d.attendance ? yscale(d.attendance) - 25 : 0))
+        .attr("y", (d, i) => (d.attendance ? yscale(d.attendance) : 0))
         .attr("width", 2)
-        .attr("height", (d, i) =>
-          d.attendance ? chartHeight - 25 - yscale(d.attendance) : 0
-        )
+        .attr("height", (d, i) => (d.attendance ? yscale(d.attendance) : 0))
         .attr("gamid", (d) => d.game_id)
         .attr("attendance", (d) => d.attendance)
         .attr("year", (d) => d.year)
@@ -196,7 +196,7 @@ class WorldMap extends React.Component {
       // set y value
       this.svgChart
         .append("g")
-        .attr("transform", "translate(50, 0)")
+        .attr("transform", "translate(50, -25)")
         .selectAll("g")
         .data(groups)
         .enter()
@@ -210,15 +210,37 @@ class WorldMap extends React.Component {
         })
         .enter()
         .append("rect")
-        .attr("x", (d, i) => xscale(d.year))
-        .attr("y", function (d, i) {
-          return yscale(d.attendance);
+        .attr("x", (dg, i) => {
+          return xscale(dg.year) + i * 2;
         })
-        .attr("height", function (d, i) {
-          return yscale(d.attendance);
+        .attr("y", (dg, i, nodes) => {
+          var prevY,
+            prevH,
+            newY,
+            currY = yscale(dg.attendance),
+            currH = yscale(dg.attendance),
+            prevSibData = i > 0 ? nodes[i - 1].__data__ : 0;
+
+          prevY = i > 0 ? chartHeight - yscale(prevSibData.attendance) : 0;
+          prevH = i > 0 ? yscale(prevSibData.attendance) : 0;
+
+          newY = currH - prevH + prevY;
+
+          console.log(i, newY, yscale(dg.attendance), dg.attendance, dg);
+          console.log(
+            i,
+            newY,
+            yscale(prevSibData.attendance),
+            prevSibData.attendance,
+            prevSibData
+          );
+
+          return newY;
         })
-        .attr("width", 10)
-        .attr("stroke", "grey");
+        .attr("height", function (dg) {
+          return chartHeight - yscale(dg.attendance);
+        })
+        .attr("width", 3);
     }
   };
 
