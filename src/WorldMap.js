@@ -66,6 +66,7 @@ class WorldMap extends React.Component {
           });
           this.createChart({
             cupData: responseTwo.data,
+            groupBy: "year",
           });
         })
       )
@@ -80,10 +81,6 @@ class WorldMap extends React.Component {
     var cupDataSorted = cupData.sort(
       (a, b) => parseFloat(a.year) - parseFloat(b.year)
     );
-    if (data.groupBy) {
-      console.log("data.groupBy", data.groupBy);
-    }
-    console.log("createChart");
 
     this.svgChart = d3
       .select(this.svg)
@@ -92,9 +89,32 @@ class WorldMap extends React.Component {
       .attr("width", width)
       .attr("height", chartHeight);
 
+    console.log("createChart");
+
     this.gChart = this.svgChart.append("g").attr("x", 0).attr("y", 0);
     self.gChart = this.gChart;
 
+    //grouing start
+    if (data.groupBy) {
+      console.log("data.groupBy", data.groupBy);
+      var group = d3.group(cupDataSorted, (d) => d.year);
+
+      var yMaxGrouped = d3.max(group, function (d) {
+        // console.log(d);
+        var games = d[1]; // group title is first aray item, then array of grouped items
+        const sum = games
+          .map((v) => parseInt(v.attendance))
+          .reduce((sum, current) => sum + current, 0);
+
+        // console.log(d[0], sum);
+
+        return isNaN(sum) ? null : sum;
+      });
+
+      console.log("yMaxGrouped", yMaxGrouped);
+    }
+
+    //
     var yMax = d3.max(cupDataSorted, function (d) {
       return +d.attendance;
     });
@@ -105,6 +125,8 @@ class WorldMap extends React.Component {
     var xMin = d3.min(cupDataSorted, function (d) {
       return +d.year;
     });
+
+    console.log(yMaxGrouped, yMax);
 
     var xscale = d3
       .scaleLinear()
