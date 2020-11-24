@@ -198,7 +198,7 @@ class WorldMap extends React.Component {
         .append("g")
         .attr("transform", "translate(50, -25)")
         .selectAll("g")
-        .data(groups)
+        .data(groups) // grouped by 'year'.
         .enter()
         .append("g")
         .attr("data-year", (d) => d[0])
@@ -211,7 +211,7 @@ class WorldMap extends React.Component {
         .enter()
         .append("rect")
         .attr("x", (dg, i) => {
-          return xscale(dg.year) + i * 2; // i've spaced these jsut so i can see and incpect them.
+          return xscale(dg.year) + i * 1; // i've spaced these jsut so i can see and incpect them.
         })
         .attr("y", (dg, i, nodes) => {
           var prevY,
@@ -219,7 +219,14 @@ class WorldMap extends React.Component {
             newY,
             currY = chartHeight - yscale(dg.attendance),
             currH = yscale(dg.attendance),
-            prevSibData = i > 0 ? nodes[i - 1].__data__ : 0;
+            prevSibData = i > 0 ? nodes[i - 1].__data__ : 0,
+            prevGames = nodes.slice(1, i);
+
+          const sum = prevGames
+            .map((v) => parseInt(v.__data__.attendance))
+            .reduce((sum, current) => sum + current, 0);
+
+          console.log(sum, yscale(sum));
 
           prevY = i > 0 ? yscale(prevSibData.attendance) : 0;
           prevH =
@@ -229,9 +236,9 @@ class WorldMap extends React.Component {
                 yscale(dg.attendance)
               : yscale(dg.attendance);
 
-          newY = chartHeight - currH - prevH;
+          newY = yscale(sum);
 
-          console.log(i, currH, prevH, newY);
+          // console.log(i, currH, prevH, newY);
 
           return newY;
         })
