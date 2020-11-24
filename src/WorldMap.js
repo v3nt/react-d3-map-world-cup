@@ -94,12 +94,12 @@ class WorldMap extends React.Component {
     this.gChart = this.svgChart.append("g").attr("x", 0).attr("y", 0);
     self.gChart = this.gChart;
 
-    //grouing start
+    //grouping start
     if (data.groupBy) {
       console.log("data.groupBy", data.groupBy);
-      var group = d3.group(cupDataSorted, (d) => d.year);
+      var groups = d3.group(cupDataSorted, (d) => d.year);
 
-      var yMaxGrouped = d3.max(group, function (d) {
+      var yMax = d3.max(groups, function (d) {
         // console.log(d);
         var games = d[1]; // group title is first aray item, then array of grouped items
         const sum = games
@@ -111,13 +111,14 @@ class WorldMap extends React.Component {
         return isNaN(sum) ? null : sum;
       });
 
-      console.log("yMaxGrouped", yMaxGrouped);
+      console.log("yMax", yMax);
+    } else {
+      var yMax = d3.max(cupDataSorted, function (d) {
+        return +d.attendance;
+      });
     }
 
     //
-    var yMax = d3.max(cupDataSorted, function (d) {
-      return +d.attendance;
-    });
 
     var xMax = d3.max(cupDataSorted, function (d) {
       return +d.year;
@@ -125,8 +126,6 @@ class WorldMap extends React.Component {
     var xMin = d3.min(cupDataSorted, function (d) {
       return +d.year;
     });
-
-    console.log(yMaxGrouped, yMax);
 
     var xscale = d3
       .scaleLinear()
@@ -170,27 +169,57 @@ class WorldMap extends React.Component {
       .attr("transform", "translate(50, " + xAxisTranslate + ")")
       .call(x_axis);
 
-    this.svgChart
-      .append("g")
-      .attr("transform", "translate(50, 25)")
-      .selectAll("rect")
-      .data(cupDataSorted)
-      .enter()
-      .append("rect")
-      .style("fill", "red")
-      .attr("x", (d, i) => (d.year ? xscale(d.year) * 1 : 0))
-      .attr("y", (d, i) => (d.attendance ? yscale(d.attendance) - 25 : 0))
-      .attr("width", 0.5)
-      .attr("height", (d, i) =>
-        d.attendance ? chartHeight - 25 - yscale(d.attendance) : 0
-      )
-      .attr("gamid", (d) => d.game_id)
-      .attr("attendance", (d) => d.attendance)
-      .attr("year", (d) => d.year)
-      .attr("team1", (d) => d.team1)
-      .attr("team2", (d) => d.team2)
-      .attr("home", (d) => d.home)
-      .attr("goals", (d) => d.goals);
+    if (!data.groupBy) {
+      this.svgChart
+        .append("g")
+        .attr("transform", "translate(50, 25)")
+        .selectAll("rect")
+        .data(cupDataSorted)
+        .enter()
+        .append("rect")
+        .style("fill", "red")
+        .attr("x", (d, i) => (d.year ? xscale(d.year) * 1 : 0))
+        .attr("y", (d, i) => (d.attendance ? yscale(d.attendance) - 25 : 0))
+        .attr("width", 2)
+        .attr("height", (d, i) =>
+          d.attendance ? chartHeight - 25 - yscale(d.attendance) : 0
+        )
+        .attr("gamid", (d) => d.game_id)
+        .attr("attendance", (d) => d.attendance)
+        .attr("year", (d) => d.year)
+        .attr("team1", (d) => d.team1)
+        .attr("team2", (d) => d.team2)
+        .attr("home", (d) => d.home)
+        .attr("goals", (d) => d.goals);
+    } else {
+      // grouped stacked bars
+      // set y value
+      this.svgChart
+        .append("g")
+        .attr("transform", "translate(50, 0)")
+        .selectAll("g")
+        .data(groups)
+        .enter()
+        .append("g")
+        .attr("data-year", (d) => d[0])
+        .attr("fill", "orange")
+        .selectAll("rect")
+        // enter a second time = loop subgroup per subgroup to add all rectangles
+        .data(function (d) {
+          return d[1];
+        })
+        .enter()
+        .append("rect")
+        .attr("x", (d, i) => xscale(d.year))
+        .attr("y", function (d, i) {
+          return yscale(d.attendance);
+        })
+        .attr("height", function (d, i) {
+          return yscale(d.attendance);
+        })
+        .attr("width", 10)
+        .attr("stroke", "grey");
+    }
   };
 
   createMap = (data) => {
