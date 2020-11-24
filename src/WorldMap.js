@@ -54,7 +54,7 @@ class WorldMap extends React.Component {
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-
+          console.log("axios loaded");
           this.setState({
             geoData: responseOne,
             cupData: responseTwo,
@@ -80,7 +80,9 @@ class WorldMap extends React.Component {
     var cupDataSorted = cupData.sort(
       (a, b) => parseFloat(a.year) - parseFloat(b.year)
     );
-
+    if (data.groupBy) {
+      console.log("data.groupBy", data.groupBy);
+    }
     console.log("createChart");
 
     this.svgChart = d3
@@ -154,10 +156,12 @@ class WorldMap extends React.Component {
       .enter()
       .append("rect")
       .style("fill", "red")
-      .attr("x", (d, i) => xscale(d.year) * 1)
-      .attr("y", (d, i) => yscale(d.attendance) - 25)
+      .attr("x", (d, i) => (d.year ? xscale(d.year) * 1 : 0))
+      .attr("y", (d, i) => (d.attendance ? yscale(d.attendance) - 25 : 0))
       .attr("width", 0.5)
-      .attr("height", (d, i) => chartHeight - 25 - yscale(d.attendance))
+      .attr("height", (d, i) =>
+        d.attendance ? chartHeight - 25 - yscale(d.attendance) : 0
+      )
       .attr("gamid", (d) => d.game_id)
       .attr("attendance", (d) => d.attendance)
       .attr("year", (d) => d.year)
