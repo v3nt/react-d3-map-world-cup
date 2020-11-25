@@ -64,7 +64,7 @@ function App() {
         datas={datas}
       /> */}
 
-      {/* <WorldMap /> */}
+      <WorldMap />
     </div>
   );
 }

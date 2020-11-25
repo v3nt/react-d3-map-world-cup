@@ -21,7 +21,6 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
   }, [dataD3]);
 
   const draw = () => {
-    console.log("draw", dataD3);
     svg = d3.select(ref.current);
     const yAxis = d3.select(yAxisRef.current);
     const g = d3
@@ -36,7 +35,7 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
       return +d.attendance;
     });
 
-    console.log("yMax", yMax);
+    // console.log("yMax", yMax);
 
     var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
 
@@ -49,10 +48,10 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
 
     yAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(y_axis);
 
-    // g.transition()
-    //   .duration(300)
-    //   .attr("height", (d) => yScale(d.attendance))
-    //   .attr("y", (d) => 0);
+    g.transition()
+      .duration(300)
+      .attr("height", (d) => 1)
+      .attr("y", (d) => 1);
 
     g.enter()
       .append("rect")
@@ -64,9 +63,9 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
       .attr("data-atten", (d) => d.attendance)
       .attr("fill", "orange")
       .transition()
-      .duration(300)
+      .duration(1000)
       .attr("height", (d) => {
-        console.log(yScale(d.attendance), d.year);
+        // console.log(yScale(d.attendance), d.year);
         return chartHeight - yScale(d.attendance);
       })
       .attr("y", (d) => yScale(d.attendance));
