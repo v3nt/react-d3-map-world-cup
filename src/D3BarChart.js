@@ -12,16 +12,13 @@ function BarChart({ width, chartHeight, chartPadding, data, datas }) {
       .select(ref.current)
       .attr("width", width)
       .attr("height", chartHeight);
-    console.log(
-      d3.max(datas, function (d) {
-        return d3.max(d);
-      })
-    );
+
     // check whole datas for max value
     // d3.max(datas.map(d => d3.max(d.map(n => n.data1))))
   }, []);
 
   useEffect(() => {
+    // ran when data is loaded or changed
     draw();
   }, [data]);
 
