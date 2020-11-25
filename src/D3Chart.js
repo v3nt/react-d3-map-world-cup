@@ -2,7 +2,14 @@
 import * as d3 from "d3";
 import React, { useRef, useEffect } from "react";
 
-function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
+function D3Chart({
+  width,
+  chartHeight,
+  chartPadding,
+  dataD3,
+  dataGroup,
+  yData,
+}) {
   const ref = useRef();
   const gref = useRef();
   const yAxisRef = useRef();
@@ -23,19 +30,34 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
   const draw = () => {
     svg = d3.select(ref.current);
     const yAxis = d3.select(yAxisRef.current);
+
     const g = d3
       .select(gref.current)
       .attr("transform", `translate(${chartPadding}, 0)`)
-      .selectAll("rect")
-      .data(dataD3.dataSet);
+      .selectAll("rect");
+    var yMax;
 
-    // this gets one row of data but should check all from datas to get max value
-    //  to avoid the axis changing scale making it hard to compare data
-    var yMax = d3.max(dataD3.dataSet, function (d) {
-      return +d.attendance;
-    });
+    if (dataGroup) {
+      var groups = d3.group(dataD3.dataSet, (d) => d.year);
+      yMax = d3.max(groups, function (d) {
+        var games = d[1]; // group title is first aray item, then array of grouped items
+        const sum = games
+          .map((v) => {
+            // console.log("yData", `v.${yData}`, v.attendance, v[`${yData}`]);
+            return parseInt(v[`${yData}`]);
+          })
+          .reduce((sum, current) => sum + current, 0);
 
-    // console.log("yMax", yMax);
+        // console.log(d[0], sum);
+
+        return isNaN(sum) ? null : sum;
+      });
+    } else {
+      yMax = d3.max(dataD3.dataSet, function (d) {
+        return +d.attendance;
+      });
+    }
+    console.log("yMax", yMax);
 
     var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
 
@@ -48,27 +70,43 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
 
     yAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(y_axis);
 
-    g.transition()
-      .duration(300)
-      .attr("height", (d) => 1)
-      .attr("y", (d) => 1);
-
-    g.enter()
-      .append("rect")
-      .attr("x", (d, i) => i * 3)
-      .attr("y", (d) => chartHeight)
-      .attr("width", 2)
-      .attr("height", 10)
-      .attr("data-year", (d) => d.year)
-      .attr("data-atten", (d) => d.attendance)
-      .attr("fill", "orange")
-      .transition()
-      .duration(1000)
-      .attr("height", (d) => {
-        // console.log(yScale(d.attendance), d.year);
-        return chartHeight - yScale(d.attendance);
-      })
-      .attr("y", (d) => yScale(d.attendance));
+    // g.transition()
+    //   .duration(300)
+    //   .attr("height", (d) => 1)
+    //   .attr("y", (d) => 1);
+    if (dataGroup) {
+      g.data(groups)
+        .enter()
+        .append("g")
+        .attr("data-year", (d) => d[0])
+        .selectAll("rect")
+        .data(function (d) {
+          return d[1];
+        })
+        .enter()
+        .append("rect")
+        .attr("y", (dg, i, nodes) => {
+          return 10;
+        })
+        .style("fill", "red");
+    } else {
+      g.data(dataD3.dataSet)
+        .enter()
+        .append("rect")
+        .attr("x", (d, i) => i * 3)
+        .attr("y", (d) => chartHeight)
+        .attr("width", 2)
+        .attr("height", 10)
+        .attr("data-year", (d) => d.year)
+        .attr("data-atten", (d) => d.attendance)
+        .attr("fill", "orange")
+        .transition()
+        .duration(500)
+        .attr("height", (d) => {
+          return chartHeight - yScale(d.attendance);
+        })
+        .attr("y", (d) => yScale(d.attendance));
+    }
 
     // g.exit()
     //   .transition()

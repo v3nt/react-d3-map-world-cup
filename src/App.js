@@ -54,7 +54,15 @@ function App() {
         chartHeight={400}
         chartPadding={45}
         dataD3={dataD3}
+        dataGroup="year"
+        yData="attendance"
       />
+      {/* <D3Chart
+        width={900}
+        chartHeight={400}
+        chartPadding={45}
+        dataD3={dataD3}
+      /> */}
       <button onClick={changeData}>Change Data</button>
       {/* <BarChart
         width={600}
@@ -64,7 +72,7 @@ function App() {
         datas={datas}
       /> */}
 
-      <WorldMap />
+      {/* <WorldMap /> */}
     </div>
   );
 }
