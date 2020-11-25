@@ -38,10 +38,7 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
 
     console.log("yMax", yMax);
 
-    var yScale = d3
-      .scaleLinear()
-      .domain([0, yMax])
-      .range([0, chartHeight - chartPadding]);
+    var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
 
     var y_axis = d3
       .axisLeft()
@@ -50,12 +47,7 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
         return i % 2 === 0 ? d : null;
       });
 
-    yAxis
-      .attr(
-        "transform",
-        "translate(" + chartPadding + " , " + chartPadding + ")"
-      )
-      .call(y_axis);
+    yAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(y_axis);
 
     // g.transition()
     //   .duration(300)
@@ -73,8 +65,11 @@ function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
       .attr("fill", "orange")
       .transition()
       .duration(300)
-      .attr("height", (d) => yScale(d.attendance))
-      .attr("y", (d) => chartHeight - yScale(d.attendance));
+      .attr("height", (d) => {
+        console.log(yScale(d.attendance), d.year);
+        return chartHeight - yScale(d.attendance);
+      })
+      .attr("y", (d) => yScale(d.attendance));
 
     // g.exit()
     //   .transition()
