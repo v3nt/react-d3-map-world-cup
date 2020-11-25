@@ -25,7 +25,13 @@ function App() {
     <div>
       <h2>Graphs with React</h2>
       <button onClick={changeData}>Change Data</button>
-      <BarChart width={600} chartHeight={400} chartPadding={30} data={data} />
+      <BarChart
+        width={600}
+        chartHeight={400}
+        chartPadding={30}
+        data={data}
+        datas={datas}
+      />
 
       {/* <WorldMap /> */}
     </div>
