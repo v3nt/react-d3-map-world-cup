@@ -13,6 +13,7 @@ function D3Chart({
   const ref = useRef();
   const gref = useRef();
   const yAxisRef = useRef();
+  const xAxisRef = useRef();
   var svg = d3
     .select(ref.current)
     .attr("width", width)
@@ -30,12 +31,13 @@ function D3Chart({
   const draw = () => {
     svg = d3.select(ref.current);
     const yAxis = d3.select(yAxisRef.current);
+    const xAxis = d3.select(xAxisRef.current);
 
     const g = d3
       .select(gref.current)
       .attr("transform", `translate(${chartPadding}, 0)`)
       .selectAll("rect");
-    var yMax;
+    var yMax, xMin, xMax;
 
     if (dataGroup) {
       var groups = d3.group(dataD3.dataSet, (d) => d.year);
@@ -52,7 +54,21 @@ function D3Chart({
 
         return isNaN(sum) ? null : sum;
       });
+
+      xMax = d3.max(dataD3.dataSet, function (d) {
+        return +d.year;
+      });
+      xMin = d3.min(dataD3.dataSet, function (d) {
+        return +d.year;
+      });
     } else {
+      xMax = d3.max(dataD3.dataSet, function (d) {
+        return +d.year;
+      });
+      xMin = d3.min(dataD3.dataSet, function (d) {
+        return +d.year;
+      });
+
       yMax = d3.max(dataD3.dataSet, function (d) {
         return +d.attendance;
       });
@@ -60,6 +76,10 @@ function D3Chart({
     console.log("yMax", yMax);
 
     var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
+    var xScale = d3
+      .scaleLinear()
+      .domain([1930, xMax])
+      .range([0, width - chartPadding]);
 
     var y_axis = d3
       .axisLeft()
@@ -68,7 +88,15 @@ function D3Chart({
         return i % 2 === 0 ? d : null;
       });
 
+    var x_axis = d3
+      .axisBottom()
+      .scale(xScale)
+      .tickFormat(function (d, i) {
+        return i % 2 === 0 ? d : null;
+      });
+
     yAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(y_axis);
+    xAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(x_axis);
 
     // g.transition()
     //   .duration(300)
@@ -76,6 +104,7 @@ function D3Chart({
     //   .attr("y", (d) => 1);
     if (dataGroup) {
       g.data(groups)
+        .remove()
         .enter()
         .append("g")
         .attr("data-year", (d) => d[0])
@@ -85,8 +114,13 @@ function D3Chart({
         })
         .enter()
         .append("rect")
+        .attr("x", (dg, i) => {
+          return dg.year ? xScale(dg.year) * 1 : 0; // i've spaced these jsut so i can see and incpect them.
+        })
+        .attr("width", 10)
+        .attr("height", 100)
         .attr("y", (dg, i, nodes) => {
-          return 10;
+          return 100;
         })
         .style("fill", "red");
     } else {
@@ -121,6 +155,7 @@ function D3Chart({
       <svg ref={ref}>
         <g ref={gref}></g>
         <g ref={yAxisRef}></g>
+        <g ref={xAxisRef}></g>
       </svg>
     </div>
   );
