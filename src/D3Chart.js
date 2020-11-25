@@ -78,7 +78,7 @@ function D3Chart({
     var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
     var xScale = d3
       .scaleLinear()
-      .domain([1930, xMax])
+      .domain([1926, xMax + 10])
       .range([0, width - chartPadding]);
 
     var y_axis = d3
@@ -108,6 +108,11 @@ function D3Chart({
         .enter()
         .append("g")
         .attr("data-year", (d) => d[0])
+        .attr("data-total-attendance", (d, nodes) => {
+          return d[1]
+            .map((v) => parseInt(v.attendance))
+            .reduce((sum, current) => sum + current, 0);
+        })
         .selectAll("rect")
         .data(function (d) {
           return d[1];
@@ -115,12 +120,22 @@ function D3Chart({
         .enter()
         .append("rect")
         .attr("x", (dg, i) => {
-          return dg.year ? xScale(dg.year) * 1 : 0; // i've spaced these jsut so i can see and incpect them.
+          return xScale(dg.year) * 1; // i've spaced these jsut so i can see and incpect them.
         })
         .attr("width", 10)
-        .attr("height", 100)
+        .attr("height", function (dg) {
+          return chartHeight - yScale(dg.attendance);
+        })
         .attr("y", (dg, i, nodes) => {
-          return 100;
+          var prevGames = nodes.slice(0, i + 1);
+
+          var sum = prevGames
+            .map((v) => parseInt(v.__data__.attendance))
+            .reduce((sum, current) => sum + current, 0);
+
+          console.log(sum, yScale(sum));
+
+          return yScale(sum);
         })
         .style("fill", "red");
     } else {
