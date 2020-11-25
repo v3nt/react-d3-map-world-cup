@@ -89,8 +89,6 @@ class WorldMap extends React.Component {
       .attr("width", width)
       .attr("height", chartHeight);
 
-    console.log("createChart");
-
     this.gChart = this.svgChart.append("g").attr("x", 0).attr("y", 0);
     self.gChart = this.gChart;
 
@@ -226,7 +224,7 @@ class WorldMap extends React.Component {
             .map((v) => parseInt(v.__data__.attendance))
             .reduce((sum, current) => sum + current, 0);
 
-          console.log(sum, yscale(sum));
+          // console.log(sum, yscale(sum));
 
           prevY = i > 0 ? yscale(prevSibData.attendance) : 0;
           prevH =

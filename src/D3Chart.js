@@ -1,98 +1,89 @@
-// import React from "react";
-// import * as d3 from "d3";
+// D3Chart.js
+import * as d3 from "d3";
+import React, { useRef, useEffect } from "react";
 
-// function createChart = (data) => {
-//   const self = this;
-//   const cupData = data.cupData;
-//   var cupDataSorted = cupData.sort(
-//     (a, b) => parseFloat(a.year) - parseFloat(b.year)
-//   );
+function D3Chart({ width, chartHeight, chartPadding, dataD3 }) {
+  const ref = useRef();
+  const gref = useRef();
+  const yAxisRef = useRef();
+  var svg = d3
+    .select(ref.current)
+    .attr("width", width)
+    .attr("height", chartHeight);
 
-//   this.svgChart = d3
-//     .select(this.svg)
-//     .append("svg")
-//     .attr("viewBox", "0 0 " + width + " " + chartHeight + "")
-//     .attr("width", width)
-//     .attr("height", chartHeight);
+  useEffect(() => {
+    // draw();
+  }, []);
 
-//   console.log("createChart");
+  useEffect(() => {
+    // ran when data is loaded or changed
+    if (dataD3.dataSet) draw();
+  }, [dataD3]);
 
-//   this.gChart = this.svgChart.append("g").attr("x", 0).attr("y", 0);
-//   self.gChart = this.gChart;
+  const draw = () => {
+    console.log("draw", dataD3);
+    svg = d3.select(ref.current);
+    const yAxis = d3.select(yAxisRef.current);
+    const g = d3
+      .select(gref.current)
+      .attr("transform", `translate(${chartPadding}, ${0 - chartPadding})`)
+      .selectAll("rect")
+      .data(dataD3.dataSet);
 
-//   var yMax = d3.max(cupDataSorted, function (d) {
-//     return +d.attendance;
-//   });
+    // this gets one row of data but should check all from datas to get max value
+    //  to avoid the axis changing scale making it hard to compare data
+    var yScale = d3
+      .scaleLinear()
+      .domain([100000, 500])
+      .range([0, chartHeight - chartPadding - chartPadding]);
 
-//   //
+    var y_axis = d3
+      .axisLeft()
+      .scale(yScale)
+      .tickFormat(function (d, i) {
+        return i % 2 === 0 ? d : null;
+      });
 
-//   var xMax = d3.max(cupDataSorted, function (d) {
-//     return +d.year;
-//   });
-//   var xMin = d3.min(cupDataSorted, function (d) {
-//     return +d.year;
-//   });
+    yAxis
+      .attr(
+        "transform",
+        "translate(" + chartPadding + " , " + chartPadding + ")"
+      )
+      .call(y_axis);
 
-//   var xscale = d3
-//     .scaleLinear()
-//     .domain([
-//       1926,
-//       d3.max(cupDataSorted, function (d) {
-//         return d.year;
-//       }),
-//     ])
-//     .range([0, width - 100]);
+    g.transition()
+      .duration(300)
+      .attr("height", (d) => yScale(d.attendance))
+      .attr("y", (d) => chartHeight - yScale(d.attendance));
 
-//   var yscale = d3
-//     .scaleLinear()
-//     .domain([0, yMax])
-//     .range([chartHeight - 25, 0]);
+    g.enter()
+      .append("rect")
+      .attr("x", (d, i) => i * 4)
+      .attr("y", (d) => chartHeight)
+      .attr("width", 3)
+      .attr("height", 10)
+      .attr("fill", "orange")
+      .transition()
+      .duration(300)
+      .attr("height", (d) => yScale(d.attendance))
+      .attr("y", (d) => chartHeight - yScale(d.attendance));
 
-//   var x_axis = d3
-//     .axisBottom()
-//     .scale(xscale)
-//     .tickFormat(function (d, i) {
-//       return i % 4 === 0 ? d : null;
-//     })
-//     .ticks((xMax - xMin) * 1);
+    // g.exit()
+    //   .transition()
+    //   .duration(300)
+    //   .attr("y", (d) => chartHeight)
+    //   .attr("height", 0)
+    //   .remove();
+  };
 
-//   var y_axis = d3
-//     .axisLeft()
-//     .scale(yscale)
-//     .tickFormat(function (d, i) {
-//       return i % 2 === 0 ? d : null;
-//     });
+  return (
+    <div className="chart">
+      <svg ref={ref}>
+        <g ref={gref}></g>
+        <g ref={yAxisRef}></g>
+      </svg>
+    </div>
+  );
+}
 
-//   this.svgChart.append("g").attr("transform", "translate(50, 0)").call(y_axis);
-
-//   var xAxisTranslate = chartHeight - 25;
-
-//   this.svgChart
-//     .append("g")
-//     .attr("transform", "translate(50, " + xAxisTranslate + ")")
-//     .call(x_axis);
-
-//   this.svgChart
-//     .append("g")
-//     .attr("transform", "translate(50, 25)")
-//     .selectAll("rect")
-//     .data(cupDataSorted)
-//     .enter()
-//     .append("rect")
-//     .style("fill", "red")
-//     .attr("x", (d, i) => (d.year ? xscale(d.year) * 1 : 0))
-//     .attr("y", (d, i) => (d.attendance ? yscale(d.attendance) - 25 : 0))
-//     .attr("width", 2)
-//     .attr("height", (d, i) =>
-//       d.attendance ? chartHeight - 25 - yscale(d.attendance) : 0
-//     )
-//     .attr("gamid", (d) => d.game_id)
-//     .attr("attendance", (d) => d.attendance)
-//     .attr("year", (d) => d.year)
-//     .attr("team1", (d) => d.team1)
-//     .attr("team2", (d) => d.team2)
-//     .attr("home", (d) => d.home)
-//     .attr("goals", (d) => d.goals);
-// };
-
-// export default d3Chart;
+export default D3Chart;

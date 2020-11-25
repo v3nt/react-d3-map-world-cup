@@ -6,15 +6,13 @@ function BarChart({ width, chartHeight, chartPadding, data, datas }) {
   const ref = useRef();
   const gref = useRef();
   const yAxisRef = useRef();
+  var svg = d3
+    .select(ref.current)
+    .attr("width", width)
+    .attr("height", chartHeight);
 
   useEffect(() => {
-    const svg = d3
-      .select(ref.current)
-      .attr("width", width)
-      .attr("height", chartHeight);
-
-    // check whole datas for max value
-    // d3.max(datas.map(d => d3.max(d.map(n => n.data1))))
+    draw();
   }, []);
 
   useEffect(() => {
@@ -23,15 +21,13 @@ function BarChart({ width, chartHeight, chartPadding, data, datas }) {
   }, [data]);
 
   const draw = () => {
-    const svg = d3.select(ref.current);
+    svg = d3.select(ref.current);
     const yAxis = d3.select(yAxisRef.current);
     const g = d3
       .select(gref.current)
       .attr("transform", `translate(${chartPadding}, ${0 - chartPadding})`)
       .selectAll("rect")
       .data(data);
-    var selection = svg;
-    var gBars;
 
     // this gets one row of data but should check all from datas to get max value
     //  to avoid the axis changing scale making it hard to compare data
