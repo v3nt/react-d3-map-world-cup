@@ -78,7 +78,7 @@ function D3Chart({
     var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
     var xScale = d3
       .scaleLinear()
-      .domain([1926, xMax + 10])
+      .domain([1926, xMax + 4])
       .range([0, width - chartPadding]);
 
     var y_axis = d3
@@ -92,8 +92,9 @@ function D3Chart({
       .axisBottom()
       .scale(xScale)
       .tickFormat(function (d, i) {
-        return i % 2 === 0 ? d : null;
-      });
+        return i % 4 === 0 ? d : null;
+      })
+      .ticks((xMax - xMin) * 0.75);
 
     yAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(y_axis);
     xAxis.attr("transform", "translate(" + chartPadding + " , 0)").call(x_axis);
@@ -108,12 +109,7 @@ function D3Chart({
       g.data(groups)
         .enter()
         .append("g")
-        .attr("data-year", (d) => d[0])
-        .attr("data-total-attendance", (d, nodes) => {
-          return d[1]
-            .map((v) => parseInt(v.attendance))
-            .reduce((sum, current) => sum + current, 0);
-        })
+        .attr("data-group-value", (d) => d[0])
         .selectAll("rect")
         .data(function (d) {
           return d[1];
@@ -121,7 +117,7 @@ function D3Chart({
         .enter()
         .append("rect")
         .attr("x", (dg, i) => {
-          return xScale(dg.year) * 1; // i've spaced these jsut so i can see and incpect them.
+          return xScale(dg.year) - 10; // i've spaced these jsut so i can see and incpect them.
         })
         .attr("width", 20)
         .attr("height", function (dg) {
