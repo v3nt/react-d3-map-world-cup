@@ -103,8 +103,9 @@ function D3Chart({
     //   .attr("height", (d) => 1)
     //   .attr("y", (d) => 1);
     if (dataGroup) {
+      //remove  first
+      g.selectAll("g").remove();
       g.data(groups)
-        .remove()
         .enter()
         .append("g")
         .attr("data-year", (d) => d[0])
@@ -122,9 +123,9 @@ function D3Chart({
         .attr("x", (dg, i) => {
           return xScale(dg.year) * 1; // i've spaced these jsut so i can see and incpect them.
         })
-        .attr("width", 10)
+        .attr("width", 20)
         .attr("height", function (dg) {
-          return chartHeight - yScale(dg.attendance);
+          return Math.ceil(chartHeight - yScale(dg.attendance));
         })
         .attr("y", (dg, i, nodes) => {
           var prevGames = nodes.slice(0, i + 1);
