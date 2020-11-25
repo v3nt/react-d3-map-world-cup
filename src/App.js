@@ -26,7 +26,12 @@ function App() {
       try {
         setDataD3({ dataSet: dataD3.dataSet, isFetching: true });
         const response = await axios.get(CUP_DATA);
-        setDataD3({ dataSet: response.data, isFetching: false });
+
+        var cupDataSorted = response.data.sort(
+          (a, b) => parseFloat(a.year) - parseFloat(b.year)
+        );
+
+        setDataD3({ dataSet: cupDataSorted, isFetching: false });
       } catch (e) {
         setDataD3({ dataSet: dataD3.dataSet, isFetching: false });
       }
@@ -51,13 +56,13 @@ function App() {
         dataD3={dataD3}
       />
       <button onClick={changeData}>Change Data</button>
-      <BarChart
+      {/* <BarChart
         width={600}
         chartHeight={400}
         chartPadding={40}
         data={data}
         datas={datas}
-      />
+      /> */}
 
       {/* <WorldMap /> */}
     </div>
