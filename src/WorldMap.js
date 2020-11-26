@@ -5,7 +5,6 @@ import "./main.scss";
 import Button from "./Button";
 import { transform } from "topojson-client";
 
-const width = 900;
 const height = 350;
 
 // const mySvg = null;
@@ -27,8 +26,8 @@ class WorldMap extends React.Component {
         geoData: null,
         cupData: null,
       },
-      width: 0,
-      height: 0,
+      width: this.props.width,
+      height: this.props.width,
       cupData: null,
       zoom: null,
     };
@@ -50,12 +49,10 @@ class WorldMap extends React.Component {
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          console.log("axios loaded");
           this.setState({
             geoData: responseOne,
             cupData: responseTwo,
           });
-
           this.createMap({
             geoData: responseOne.data,
             cupData: responseTwo.data,
@@ -74,8 +71,8 @@ class WorldMap extends React.Component {
     this.mySvg = d3
       .select(this.svg)
       .append("svg")
-      .attr("viewBox", "0 0 " + width + " " + height + "")
-      .attr("width", width)
+      .attr("viewBox", "0 0 " + this.props.width + " " + height + "")
+      .attr("width", this.props.width)
       .attr("height", height);
 
     this.g = this.mySvg.append("g").attr("x", 0).attr("y", 0);
@@ -86,7 +83,7 @@ class WorldMap extends React.Component {
     this.projection = d3
       .geoMercator()
       .scale(100)
-      .translate([width / 2, height / 2]);
+      .translate([this.props.width / 2, height / 2]);
 
     this.path = d3.geoPath().projection(this.projection);
 
