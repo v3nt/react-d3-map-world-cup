@@ -18,9 +18,7 @@ class WorldMap extends React.Component {
 
     this.state = {
       mySvg: null,
-      myChart: null,
       g: null,
-      gChart: null,
       path: null,
       map: null,
       svg: this.svg,
@@ -29,13 +27,9 @@ class WorldMap extends React.Component {
         geoData: null,
         cupData: null,
       },
-      yAxisAttribute: "skill",
-      xAxisAttribute: "attendence",
       width: 0,
       height: 0,
     };
-
-    this.chartRef = React.createRef();
   }
 
   componentDidUpdate() {}
@@ -197,21 +191,19 @@ class WorldMap extends React.Component {
   render() {
     return (
       <div>
-        <Button label="Reset" onClickFunction={this.reset_zoom} />
-        <Button label="Fit map" onClickFunction={this.map_zoom} />
-        <Button label="Fit markers" onClickFunction={this.map_zoom} />
-        <Button label="Fit USA" onClickFunction={this.map_zoom} />
-        <Button
-          label="zoomed"
-          selection="circles"
-          onClickFunction={this.zoomed}
-        />
-        <Button
-          label="Attendence > 50000"
-          target={"circle"}
-          value="50000"
-          onClickFunction={this.markers_by_value}
-        />
+        <p>
+          <Button label="Reset" onClickFunction={this.reset_zoom} />
+          <Button label="Fit map" onClickFunction={this.map_zoom} />
+          <Button label="Fit markers" onClickFunction={this.map_zoom} />
+          <Button label="Fit USA" onClickFunction={this.map_zoom} />
+
+          <Button
+            label="Attendence > 50000"
+            target={"circle"}
+            value="50000"
+            onClickFunction={this.markers_by_value}
+          />
+        </p>
 
         <div ref={(svg) => (this.svg = svg)}></div>
         <div ref={(keyCity) => (this.keyCity = keyCity)}></div>

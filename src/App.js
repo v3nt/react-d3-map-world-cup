@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 //
 import WorldMap from "./WorldMap";
-import BarChart from "./D3BarChart";
 import D3Chart from "./D3Chart";
 
 const datas = [
@@ -20,8 +19,6 @@ function App() {
   const [dataD3, setDataD3] = useState([]);
 
   useEffect(() => {
-    changeData();
-
     const fatchData = async () => {
       try {
         setDataD3({ dataSet: dataD3.dataSet, isFetching: true });
@@ -39,12 +36,6 @@ function App() {
     fatchData();
   }, []);
 
-  const changeData = () => {
-    setData(datas[i++]);
-
-    if (i === datas.length) i = 0;
-  };
-
   return (
     <div>
       <h1>D3 data experiments</h1>
@@ -52,7 +43,7 @@ function App() {
       <WorldMap />
 
       <h2>Various charts from the same data</h2>
-
+      <h3>`Attendance` grouped by `year`</h3>
       <D3Chart
         width={900}
         chartHeight={400}
@@ -61,13 +52,13 @@ function App() {
         dataGroup="year"
         yData="attendance"
       />
+      <h3>Attendance for every game</h3>
       <D3Chart
         width={900}
         chartHeight={400}
         chartPadding={55}
         dataD3={dataD3}
       />
-      <button onClick={changeData}>Change Data</button>
     </div>
   );
 }
