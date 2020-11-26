@@ -47,12 +47,16 @@ function App() {
 
   return (
     <div>
-      <h2>Graphs with React</h2>
+      <h1>D3 data experiments</h1>
+      <p>World cup data 1930 — 2014</p>
+      <WorldMap />
+
+      <h2>Various charts from the same data</h2>
 
       <D3Chart
         width={900}
         chartHeight={400}
-        chartPadding={45}
+        chartPadding={55}
         dataD3={dataD3}
         dataGroup="year"
         yData="attendance"
@@ -60,19 +64,10 @@ function App() {
       <D3Chart
         width={900}
         chartHeight={400}
-        chartPadding={45}
+        chartPadding={55}
         dataD3={dataD3}
       />
       <button onClick={changeData}>Change Data</button>
-      {/* <BarChart
-        width={600}
-        chartHeight={400}
-        chartPadding={40}
-        data={data}
-        datas={datas}
-      /> */}
-
-      <WorldMap />
     </div>
   );
 }
