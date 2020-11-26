@@ -18,6 +18,7 @@ class WorldMap extends React.Component {
 
     this.state = {
       mySvg: null,
+      circles: null,
       g: null,
       path: null,
       map: null,
@@ -29,6 +30,8 @@ class WorldMap extends React.Component {
       },
       width: 0,
       height: 0,
+      cupData: null,
+      zoom: null,
     };
   }
 
@@ -78,30 +81,8 @@ class WorldMap extends React.Component {
 
     this.g = this.mySvg.append("g").attr("x", 0).attr("y", 0);
     self.g = this.g;
-
-    this.mySvg.call(
-      d3
-        .zoom()
-        .scaleExtent([1, 15])
-        .on("zoom", function (event) {
-          const { transform } = event;
-          self.g.attr("transform", transform);
-          self.g
-            .selectAll("circle")
-            .transition()
-            .duration(750)
-            .attr("r", (d) => transformRadius(transform, d.attendance));
-          // .attr("r", radius / (transform.k > 0 ? transform.k * 0.9 : radius));
-        })
-    );
-
-    const transformRadius = (trans, attendance) => {
-      var newRadius =
-        attendance && trans.k > 1.5
-          ? (0.00005 * attendance) / trans.k
-          : 0.00005 * attendance;
-      return newRadius;
-    };
+    var zoomObject = d3.zoom().scaleExtent([1, 15]).on("zoom", this.zoomed);
+    this.mySvg.call(zoomObject);
 
     this.projection = d3
       .geoMercator()
@@ -110,7 +91,7 @@ class WorldMap extends React.Component {
 
     this.path = d3.geoPath().projection(this.projection);
 
-    this.map = this.g
+    this.g
       .selectAll("path")
       .data(data.geoData.features)
       .enter()
@@ -120,12 +101,12 @@ class WorldMap extends React.Component {
 
     //works up to here
 
-    const circles = this.g
+    this.g
       .selectAll("circle")
       .data(data.cupData)
       .enter()
       .append("circle")
-      .attr("r", (d) => (d.attendance ? 0.00005 * d.attendance : 3))
+      .attr("r", (d) => 0)
       .attr("gamid", (d) => d.game_id)
       .attr("year", (d) => d.year)
       .attr("team1", (d) => d.team1)
@@ -138,6 +119,12 @@ class WorldMap extends React.Component {
         (d) => `translate(${this.projection([d.long, d.lat])})`
       );
 
+    this.g
+      .selectAll("circle")
+      .transition()
+      .duration(750)
+      .attr("r", (d) => (d.attendance ? 0.00004 * d.attendance : 1));
+
     // const circlesB = mySvg
     //   .append("g")
     //   .selectAll("circle")
@@ -148,6 +135,61 @@ class WorldMap extends React.Component {
     //   .attr("fill", "red")
     //   .attr("class", "location-marker")
     //   .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
+  };
+
+  filterMarkers = (params) => {
+    var initData = this.state.cupData.data;
+    var filteredData, groupedData;
+    var g = this.g;
+    g.selectAll("circle").data(
+      (filteredData = initData.filter(function (d) {
+        return d.team1 == "Chile";
+      }))
+    );
+    groupedData = d3.group(filteredData, (d) => d.team1);
+
+    console.log(initData, filteredData, groupedData);
+    g.selectAll("circle").remove();
+    g.selectAll("circle")
+      .data(filteredData)
+      .enter()
+      .append("circle")
+      .attr("r", (d) => 0)
+      .attr("fill", "red")
+      .attr("class", "location-marker")
+      .attr("class", "marker-filtered")
+      .attr("year", (d) => d.year)
+      .attr("team1", (d) => d.team1)
+      .attr("team2", (d) => d.team2)
+      .attr(
+        "transform",
+        (d) => `translate(${this.projection([d.long, d.lat])})`
+      );
+
+    g.selectAll("circle")
+      .transition()
+      .duration(750)
+      .attr("r", (d) => 5);
+
+    this.mySvg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", this.zoomed));
+  };
+  zoomed = (event) => {
+    const transform = event.transform;
+    var g = this.g;
+    g.attr("transform", transform);
+    g.selectAll("circle")
+      .transition()
+      .duration(300)
+      // .attr("r", (d) => transformRadius(transform, d.attendance));
+      .attr("r", 5 / transform.k);
+  };
+
+  transformRadius = (trans, attendance) => {
+    var newRadius =
+      attendance && trans.k > 1.5
+        ? (0.00005 * attendance) / trans.k
+        : 0.00005 * attendance;
+    return newRadius;
   };
 
   reset_zoom = () => {
@@ -193,16 +235,13 @@ class WorldMap extends React.Component {
       <div>
         <p>
           <Button label="Reset" onClickFunction={this.reset_zoom} />
-          <Button label="Fit map" onClickFunction={this.map_zoom} />
-          <Button label="Fit markers" onClickFunction={this.map_zoom} />
-          <Button label="Fit USA" onClickFunction={this.map_zoom} />
-
           <Button
             label="Attendence > 50000"
             target={"circle"}
             value="50000"
             onClickFunction={this.markers_by_value}
           />
+          <Button label="Filter by" onClickFunction={this.filterMarkers} />
         </p>
 
         <div ref={(svg) => (this.svg = svg)}></div>

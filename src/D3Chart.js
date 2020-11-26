@@ -130,7 +130,7 @@ function D3Chart({
             .map((v) => parseInt(v.__data__.attendance))
             .reduce((sum, current) => sum + current, 0);
 
-          console.log(sum, yScale(sum));
+          // console.log(sum, yScale(sum));
 
           return yScale(sum);
         })
