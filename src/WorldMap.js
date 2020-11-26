@@ -124,17 +124,6 @@ class WorldMap extends React.Component {
       .transition()
       .duration(750)
       .attr("r", (d) => (d.attendance ? 0.00004 * d.attendance : 1));
-
-    // const circlesB = mySvg
-    //   .append("g")
-    //   .selectAll("circle")
-    //   .data(data.cupData)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("r", (d) => (d.attendance ? 0.00002 * d.attendance : 1))
-    //   .attr("fill", "red")
-    //   .attr("class", "location-marker")
-    //   .attr("transform", (d) => `translate(${projection([d.long, d.lat])})`);
   };
 
   filterMarkers = (params) => {
@@ -148,7 +137,7 @@ class WorldMap extends React.Component {
     );
     groupedData = d3.group(filteredData, (d) => d.team1);
 
-    console.log(initData, filteredData, groupedData);
+    // console.log(initData, filteredData, groupedData);
     g.selectAll("circle").remove();
     g.selectAll("circle")
       .data(filteredData)
