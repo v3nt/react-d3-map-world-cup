@@ -73,7 +73,7 @@ function D3Chart({
         return +d.attendance;
       });
     }
-    console.log("yMax", yMax);
+    // console.log("yMax", yMax);
 
     var yScale = d3.scaleLinear().domain([0, yMax]).range([chartHeight, 0]);
     var xScale = d3
@@ -117,7 +117,7 @@ function D3Chart({
         .enter()
         .append("rect")
         .attr("x", (dg, i) => {
-          return xScale(dg.year) - 10; // i've spaced these jsut so i can see and incpect them.
+          return dg.year ? xScale(dg.year) : 0;
         })
         .attr("width", 20)
         .attr("height", function (dg) {

@@ -3,16 +3,19 @@ import axios from "axios";
 //
 import WorldMap from "./WorldMap";
 import D3Chart from "./D3Chart";
+//
+import Dropdown from "./Dropdown";
 
 const CUP_DATA =
   "https://raw.githubusercontent.com/ahebwa49/geo_mapping/master/src/world_cup_geo.json";
 
 const docMargins = 30;
 
-function App() {
+function App(data) {
   // const [data, setData] = useState([5, 10, 15, 30]);
   const [dataD3, setDataD3] = useState([]);
-
+  const [selected, setSelected] = useState();
+  const [options, setOptions] = useState();
   const [dimensions, setDimensions] = React.useState({
     height: window.innerHeight,
     width: window.innerWidth,
@@ -22,7 +25,6 @@ function App() {
   useEffect(() => {
     const fatchData = async () => {
       try {
-        setDataD3({ dataSet: dataD3.dataSet, isFetching: true });
         const response = await axios.get(CUP_DATA);
 
         var cupDataSorted = response.data.sort(
@@ -30,8 +32,16 @@ function App() {
         );
 
         setDataD3({ dataSet: cupDataSorted, isFetching: false });
+
+        setOptions(cupDataSorted);
+
+        setSelected(cupDataSorted[0].team1);
+
+        console.log("fatchData, setSelected", cupDataSorted[0], cupDataSorted);
       } catch (e) {
-        setDataD3({ dataSet: dataD3.dataSet, isFetching: false });
+        setDataD3({ dataSet: cupDataSorted, isFetching: false });
+        setOptions({});
+        setSelected({});
       }
     };
     fatchData();
@@ -51,6 +61,18 @@ function App() {
     <div>
       <h1>D3 data experiments</h1>
       <p>World cup data 1930 — 2014</p>
+
+      <Dropdown
+        options={options}
+        selected={selected}
+        title=""
+        onSelectedChange={setSelected}
+        objectKey="team1"
+        objectValue="team1"
+        groupByValue="team1"
+        orderByValue="team1"
+      />
+
       <WorldMap width={dimensions.widthUsed} />
 
       <h2>Various charts from the same data</h2>
